@@ -1,22 +1,67 @@
-﻿(() => {
+(() => {
+  'use strict';
   const form = document.querySelector('#terminal-form');
   const input = document.querySelector('#terminal-input');
   const output = document.querySelector('#terminal-output');
   if (!form || !input || !output) return;
-  const responses = {
-    help: 'Commands: help, whoami, about, skills, projects, research, github, contact, status, mission, clear.',
-    whoami: 'Abdul Masood | Founder & CEO, D.R.D Security Private Limited.',
-    about: 'Executive focus: security analysis, penetration testing, VAPT, DFIR, research, training, and cyber resilience.',
-    skills: 'Networking, Linux, penetration testing, VAPT, DFIR, forensics, incident response, cloud security, threat hunting, scripting, and research.',
-    projects: 'Systems: LYRA AIOS; D.R.D COMMAND OS; CLOUDFUSION; D.R.D Training / Security Ecosystem.',
-    research: 'Cybersecurity, penetration testing, DFIR, threat intelligence, cloud security, malware analysis, incident response, AI in cybersecurity, and security research.',
-    github: 'Public profile: https://github.com/drdsecurity',
-    contact: 'Verified channels: GitHub, drdsecurity.com, LinkedIn, YouTube, Instagram, and Discord.',
-    status: 'SYSTEM // ONLINE\nMISSION // LEARN | RESEARCH | INVESTIGATE',
-    mission: 'Building Global Cyber Resilience through Awareness, Education & Collaboration.'
+
+  const history = [];
+  let historyIndex = -1;
+  const appendLine = (text, className = 'terminal-response') => {
+    const entry = document.createElement('p');
+    entry.className = className;
+    entry.textContent = text;
+    output.append(entry);
+    output.scrollTop = output.scrollHeight;
   };
-  const history = []; let historyIndex = -1;
-  const line = (text, kind = '') => { const entry = document.createElement('p'); if (kind) entry.className = kind; entry.textContent = text; output.append(entry); output.scrollTop = output.scrollHeight; };
-  form.addEventListener('submit', event => { event.preventDefault(); const command = input.value.trim().toLowerCase(); if (!command) return; line(`drdsecurity@cyber-core:~$ ${command}`, 'terminal-command'); history.unshift(command); historyIndex = -1; if (command === 'clear') { output.replaceChildren(); } else { line(responses[command] || `Unknown command: ${command}. Type help for available commands.`, 'terminal-response'); } input.value = ''; });
-  input.addEventListener('keydown', event => { if (event.key === 'ArrowUp' && history.length) { event.preventDefault(); historyIndex = Math.min(historyIndex + 1, history.length - 1); input.value = history[historyIndex]; } if (event.key === 'ArrowDown' && history.length) { event.preventDefault(); historyIndex = Math.max(historyIndex - 1, -1); input.value = historyIndex < 0 ? '' : history[historyIndex]; } });
+  const navigate = navKey => {
+    if (typeof window.navigateTo !== 'function' || !window.navigateTo(navKey)) {
+      appendLine('Navigation controller unavailable.', 'terminal-response');
+      return;
+    }
+    appendLine(`NAVIGATION // ${navKey.toUpperCase()} SELECTED`, 'terminal-response');
+  };
+  const commands = Object.freeze({
+    help: () => appendLine('Commands: help, about, skills, projects, research, contact, github, clear, home, arsenal, achievements, status.'),
+    about: () => appendLine('Abdul Masood | Founder & CEO, D.R.D Security Private Limited. Focus: security analysis, VAPT, DFIR, research, training, and cyber resilience.'),
+    skills: () => appendLine('Networking, Linux, penetration testing, VAPT, DFIR, digital forensics, incident response, malware analysis, cloud security, threat hunting, and scripting.'),
+    projects: () => appendLine('Systems: LYRA AIOS; DRD GUARDIAN SUIT; DRD GUARDIAN HL150; DRD VAJRA-X.'),
+    research: () => appendLine('Research Areas: AI in Cyber Security; IoT Security; Malware Analysis; Cloud Security; Threat Intelligence; DFIR & Incident Response.'),
+    contact: () => appendLine('Verified channels: github.com/drdsecurity | drdsecurity.com | LinkedIn | YouTube | Instagram | Discord.'),
+    github: () => appendLine('Public profile: https://github.com/drdsecurity | Public repositories and contribution activity available.'),
+    clear: () => output.replaceChildren(),
+    home: () => navigate('home'),
+    arsenal: () => navigate('arsenal'),
+    achievements: () => navigate('achievements'),
+    status: () => appendLine('SYSTEM // ONLINE\nNODE // DRD-HQ\nMISSION // LEARN | RESEARCH | INVESTIGATE')
+  });
+  const runCommand = rawCommand => {
+    const command = rawCommand.trim().toLowerCase();
+    if (!command) return;
+    history.unshift(command);
+    historyIndex = -1;
+    appendLine(`drdsecurity@cyber-core:~$ ${command}`, 'terminal-command');
+    const handler = commands[command];
+    if (handler) handler();
+    else appendLine("Unknown command. Type 'help' to view available commands.");
+  };
+
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    runCommand(input.value);
+    input.value = '';
+    input.focus();
+  });
+  input.addEventListener('keydown', event => {
+    if (event.key === 'ArrowUp' && history.length) {
+      event.preventDefault();
+      historyIndex = Math.min(historyIndex + 1, history.length - 1);
+      input.value = history[historyIndex];
+    }
+    if (event.key === 'ArrowDown' && history.length) {
+      event.preventDefault();
+      historyIndex = Math.max(historyIndex - 1, -1);
+      input.value = historyIndex < 0 ? '' : history[historyIndex];
+    }
+  });
 })();
