@@ -2,6 +2,7 @@
   const hero = document.querySelector('.hero');
   const copy = document.querySelector('.hero-copy');
   const hud = document.querySelector('.founder-hud');
+  const portrait = document.querySelector('.portrait-frame');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!hero || reduced || !window.gsap) return;
 
@@ -11,8 +12,30 @@
   gsap.from(hud, { y: 26, opacity: 0, duration: 1, ease: 'power2.out', delay: .28 });
   gsap.to('.portrait-frame', { y: -6, duration: 4.8, repeat: -1, yoyo: true, ease: 'sine.inOut' });
   if (window.ScrollTrigger) {
-    gsap.to([copy, hud], { y: -34, opacity: .45, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: .55 } });
-    window.ScrollTrigger.create({ trigger: hero, start: 'top top', end: 'bottom top', scrub: .55, onUpdate: self => window.DrdHero3D?.setScroll(self.progress) });
+    const restoreHero = () => {
+      gsap.set([copy, hud, portrait], { clearProps: 'opacity,visibility,filter,clipPath' });
+      gsap.set([copy, hud, portrait], { autoAlpha: 1 });
+      portrait?.style.removeProperty('filter');
+      portrait?.style.removeProperty('clip-path');
+    };
+    gsap.to([copy, hud], {
+      y: -22,
+      opacity: .6,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: hero,
+        start: '60% top',
+        end: 'bottom top',
+        scrub: .55,
+        invalidateOnRefresh: true,
+        onEnterBack: restoreHero,
+        onLeaveBack: restoreHero,
+        onUpdate: self => { if (self.progress <= 0.001) restoreHero(); },
+        onRefresh: self => { if (self.progress <= 0.001) restoreHero(); }
+      }
+    });
+    window.ScrollTrigger.create({ trigger: hero, start: 'top top', end: 'bottom top', scrub: .55, invalidateOnRefresh: true, onUpdate: self => window.DrdHero3D?.setScroll(self.progress) });
+    window.addEventListener('pageshow', () => window.requestAnimationFrame(restoreHero));
   }
   if (window.matchMedia('(min-width: 821px)').matches && hud) {
     const xTo = gsap.quickTo(hud, 'x', { duration: .8, ease: 'power3.out' });
@@ -36,7 +59,6 @@
   gsap.from('.project-card', { y: 20, opacity: 0, duration: .52, stagger: { each: .08, from: 'start' }, ease: 'power2.out', scrollTrigger: { trigger: '.projects-grid', start: 'top 84%' } });
   gsap.from('.intelligence-panel', { y: 20, opacity: 0, duration: .5, stagger: .09, ease: 'power2.out', scrollTrigger: { trigger: '.intelligence-grid', start: 'top 84%' } });
   gsap.from('.research-node', { y: 14, opacity: 0, duration: .42, stagger: .04, ease: 'power2.out', scrollTrigger: { trigger: '.research-map', start: 'top 84%' } });
-  gsap.from('.achievement-timeline li', { x: -14, opacity: 0, duration: .55, ease: 'power2.out', scrollTrigger: { trigger: '.achievement-timeline', start: 'top 85%' } });
 })();
 (() => {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !window.gsap || !window.ScrollTrigger) return;
