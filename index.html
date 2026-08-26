@@ -1,15 +1,16 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Abdul Masood — Founder and CEO of D.R.D Security Private Limited.">
+  <meta name="description" content="Abdul Masood - Founder and CEO of D.R.D Security Private Limited.">
   <meta name="theme-color" content="#050b11">
   <title>Abdul Masood | D.R.D Security</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="ambient-grid" aria-hidden="true"></div>
+  <canvas class="three-hero" aria-hidden="true"></canvas>
   <header class="site-header">
     <a class="brand" href="#hero" aria-label="D.R.D Security home"><img src="assets/images/branding/drd-logo.png" alt="D.R.D Security logo"><span>D.R.D <b>SECURITY</b></span></a>
     <nav class="desktop-nav" aria-label="Primary navigation"><a class="is-active" href="#hero">Home</a><a href="#hero">About</a><a href="#hero">Arsenal</a><a href="#hero">Projects</a><a href="#hero">Research</a><a href="#hero">Contact</a></nav>
@@ -22,9 +23,9 @@
       <h1 id="page-title">Abdul<br><em>Masood</em></h1>
       <p class="title">Founder &amp; CEO <span>/</span> D.R.D Security Private Limited</p>
       <div class="capabilities" aria-label="Cybersecurity specialties"><span>Security Analyst</span><span>Penetration Tester</span><span>Forensics Investigator</span><span>VAPT</span><span>DFIR</span></div>
-      <p class="supporting-roles">Trainer <i>•</i> Speaker <i>•</i> Author</p>
+      <p class="supporting-roles">Trainer / Speaker / Author</p>
       <p class="mission">Building Global Cyber Resilience<br>through <strong>Awareness</strong>, <strong>Education</strong> &amp; <strong>Collaboration</strong>.</p>
-      <div class="actions"><a class="button button-primary" href="#projects">Explore projects <span aria-hidden="true">↗</span></a><a class="button button-secondary" href="https://github.com/drdsecurity">GitHub profile <span aria-hidden="true">↗</span></a></div>
+      <div class="actions"><a class="button button-primary" href="#projects">Explore projects <span aria-hidden="true">&gt;</span></a><a class="button button-secondary" href="https://github.com/drdsecurity">GitHub profile <span aria-hidden="true">&gt;</span></a></div>
     </section>
     <section class="founder-hud" aria-label="Founder node visual and operational telemetry">
       <div class="hud-top"><span>DRD / EXECUTIVE NODE</span><span><i></i> SECURE LINK</span></div>
@@ -36,5 +37,10 @@
       <div class="hud-bottom"><span>IDENTITY VERIFIED</span><span>GLOBAL CYBER RESILIENCE</span></div>
     </section>
   </main>
+  <script defer src="https://unpkg.com/three@0.160.1/build/three.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script defer src="js/three-hero.js"></script>
+  <script defer src="js/hero-motion.js"></script>
 </body>
 </html>
