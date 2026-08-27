@@ -13,7 +13,7 @@
     document.body.append(cursor);
     const trail = cursor.querySelector('.cyber-cursor__trail');
 
-    const state = { x: 0, y: 0, ringX: 0, ringY: 0, previousX: 0, previousY: 0, active: false, target: null };
+    const state = { x: 0, y: 0, ringX: 0, ringY: 0, previousX: 0, previousY: 0, magneticX: 0, magneticY: 0, active: false, target: null };
     const interactiveSelector = 'a, button, [role="button"], .project-card, .arsenal-grid article, .contact-channels a';
     const inputSelector = 'input, textarea, select, [contenteditable="true"]';
     const magneticSelector = '.button, .desktop-nav a, .mobile-nav a, .project-card';
@@ -28,6 +28,15 @@
       cursor.classList.toggle('is-lock', Boolean(target?.closest(interactiveSelector)) && !target?.closest(inputSelector));
       cursor.classList.toggle('is-scan', Boolean(target?.closest('.project-visual')));
       cursor.classList.toggle('is-arsenal', Boolean(target?.closest('.arsenal-grid article')));
+      const magneticTarget = target?.closest(magneticSelector);
+      if (!magneticTarget || cursor.classList.contains('is-input')) {
+        state.magneticX = 0;
+        state.magneticY = 0;
+        return;
+      }
+      const rect = magneticTarget.getBoundingClientRect();
+      state.magneticX = Math.max(-4, Math.min(4, (rect.left + rect.width / 2 - state.x) * .035));
+      state.magneticY = Math.max(-4, Math.min(4, (rect.top + rect.height / 2 - state.y) * .035));
     };
 
     const pointerMove = event => {
@@ -44,17 +53,9 @@
 
     const update = () => {
       const reduced = reducedMotion?.matches;
-      let magneticX = 0;
-      let magneticY = 0;
-      const magneticTarget = state.target?.closest(magneticSelector);
-      if (magneticTarget && !cursor.classList.contains('is-input')) {
-        const rect = magneticTarget.getBoundingClientRect();
-        magneticX = Math.max(-4, Math.min(4, (rect.left + rect.width / 2 - state.x) * .035));
-        magneticY = Math.max(-4, Math.min(4, (rect.top + rect.height / 2 - state.y) * .035));
-      }
       const follow = reduced ? 1 : .24;
-      state.ringX += (state.x + magneticX - state.ringX) * follow;
-      state.ringY += (state.y + magneticY - state.ringY) * follow;
+      state.ringX += (state.x + state.magneticX - state.ringX) * follow;
+      state.ringY += (state.y + state.magneticY - state.ringY) * follow;
       cursor.style.setProperty('--cursor-x', `${state.x}px`);
       cursor.style.setProperty('--cursor-y', `${state.y}px`);
       cursor.style.setProperty('--ring-x', `${state.ringX}px`);
@@ -69,8 +70,9 @@
       } else trail.classList.add('is-idle');
       state.previousX = state.x;
       state.previousY = state.y;
-      frame = window.requestAnimationFrame(update);
+      frame = !document.hidden ? window.requestAnimationFrame(update) : 0;
     };
+    const wake = () => { if (!document.hidden && !frame) frame = window.requestAnimationFrame(update); };
 
     const burst = event => {
       if (reducedMotion?.matches || !state.active) return;
@@ -97,6 +99,7 @@
     window.addEventListener('pointerdown', burst, { passive: true });
     document.addEventListener('pointerleave', () => cursor.classList.remove('is-visible'));
     document.addEventListener('pointerenter', () => { if (state.active) cursor.classList.add('is-visible'); });
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) wake(); });
     finePointer.addEventListener?.('change', event => {
       if (!event.matches) {
         window.cancelAnimationFrame(frame);
@@ -104,7 +107,7 @@
         document.body.classList.remove('custom-cursor-enabled');
       }
     });
-    frame = window.requestAnimationFrame(update);
+    wake();
   } catch {
     document.body.classList.remove('custom-cursor-enabled');
   }

@@ -110,7 +110,7 @@
     camera.updateProjectionMatrix();
   }
 
-  let visible = true;
+  let visible = !('IntersectionObserver' in window);
   let frame = 0;
   const render = () => {
     const elapsed = clock.getElapsedTime();
@@ -136,5 +136,6 @@
   window.addEventListener('resize', resize, { passive: true });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) { frame = 0; wake(); } });
   resize();
-  render();
+  if (reducedMotion) render();
+  else wake();
 })();

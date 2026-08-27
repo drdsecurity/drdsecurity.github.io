@@ -24,9 +24,9 @@
   const emitter = new THREE.Mesh(new THREE.SphereGeometry(.042, 10, 8), new THREE.MeshBasicMaterial({ color: 0xd1faff, transparent: true, opacity: .92 })); emitter.position.y = -1.49; base.add(emitter);
   suit.rotation.set(-.03, -.35, 0);
   function resize() { const width = container.clientWidth, height = container.clientHeight; if (!width || !height) return; renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5)); renderer.setSize(width, height, false); camera.aspect = width / height; const half = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)); camera.position.set(1.75, .45, Math.max(5.05, 1.55 / (half * camera.aspect * .92), 1.75 / (half * .92))); camera.lookAt(0, -.2, 0); camera.updateProjectionMatrix(); }
-  let visible = true, frame = 0;
+  let visible = !('IntersectionObserver' in window), frame = 0;
   const render = () => { const t = clock.getElapsedTime(); suit.rotation.y = -.35 + t * (Math.PI * 2 / 25); suit.position.y = Math.sin(t * .8) * .025; base.rotation.y = -t * .055; rings.forEach((ring, index) => { ring.rotation.z += .0002 + index * .00007; }); emitter.scale.setScalar(.84 + Math.sin(t * 1.6) * .12); renderer.render(scene, camera); if (!reduced && visible && !document.hidden) frame = requestAnimationFrame(render); else frame = 0; };
   const wake = () => { if (!reduced && visible && !document.hidden && !frame) frame = requestAnimationFrame(render); };
   if ('IntersectionObserver' in window) { const observer = new IntersectionObserver(entries => { visible = entries[0]?.isIntersecting ?? true; if (visible) wake(); }, { threshold: .05 }); observer.observe(container); }
-  if ('ResizeObserver' in window) new ResizeObserver(resize).observe(container); window.addEventListener('resize', resize, { passive: true }); document.addEventListener('visibilitychange', () => { if (!document.hidden) { frame = 0; wake(); } }); resize(); render();
+  if ('ResizeObserver' in window) new ResizeObserver(resize).observe(container); window.addEventListener('resize', resize, { passive: true }); document.addEventListener('visibilitychange', () => { if (!document.hidden) { frame = 0; wake(); } }); resize(); if (reduced) render(); else wake();
 })();

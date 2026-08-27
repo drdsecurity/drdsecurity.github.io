@@ -66,6 +66,7 @@
     const width = hero.clientWidth, height = hero.clientHeight;
     renderer.setSize(width, height, false); camera.aspect = width / height; camera.position.z = mobile ? 7.4 : 6.6; camera.updateProjectionMatrix();
   }
+  let frame = 0;
   function render() {
     const elapsed = clock.getElapsedTime();
     pointer.lerp(target, .035);
@@ -73,11 +74,12 @@
     network.rotation.x = pointer.y * .02;
     globe.rotation.y = elapsed * .055; arc.rotation.z = -.55 + elapsed * .025;
     renderer.render(scene, camera);
-    if (!document.hidden) requestAnimationFrame(render);
+    frame = !document.hidden ? requestAnimationFrame(render) : 0;
   }
+  const wake = () => { if (!document.hidden && !frame) frame = requestAnimationFrame(render); };
   window.addEventListener('resize', resize, { passive: true });
   window.addEventListener('pointermove', event => { if (!mobile) target.set((event.clientX / innerWidth - .5), -(event.clientY / innerHeight - .5)); }, { passive: true });
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) { clock.getDelta(); render(); } });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { clock.getDelta(); wake(); } });
   resize(); render();
   window.DrdHero3D = { setScroll(progress) { camera.position.y = progress * .32; network.position.z = -progress * .65; } };
 })();

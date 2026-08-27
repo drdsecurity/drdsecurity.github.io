@@ -60,7 +60,12 @@
   window.restoreHeroVisualState = restoreHeroVisualState;
 
   const setActiveNav = navKey => {
-    sidebarControls.forEach(control => control.classList.toggle('is-active', control.dataset.navTarget === navKey));
+    sidebarControls.forEach(control => {
+      const isActive = control.dataset.navTarget === navKey;
+      control.classList.toggle('is-active', isActive);
+      if (isActive) control.setAttribute('aria-current', 'page');
+      else control.removeAttribute('aria-current');
+    });
   };
   const setSpotlight = navKey => {
     document.querySelectorAll('.nav-target-active').forEach(element => element.classList.remove('nav-target-active'));
